@@ -64,11 +64,29 @@ Pick a color from the palette and adjust the stroke width with `-` / `+`.
 
 ## Install
 
-Requirements: GTK4 (PyGObject), Python 3.11+.
+Requirements: GTK4 (PyGObject) and Python 3.11+ from your system.
+
+### One-command install (no root, no AUR)
 
 ```bash
 git clone https://github.com/Nurmuhammad-Xusanov/pdfreader.git
 cd pdfreader
+./install.sh
+```
+
+This installs the app to `~/.local`, creates the `.desktop` entry and icon, and
+makes PDF Reader the default handler for `application/pdf`. Launch it from the
+app menu, by double-clicking a PDF, or with `~/.local/bin/pdfreader`.
+
+### From the GitHub release
+
+```bash
+pipx run pip install ./pdfreader-0.1.0.whl
+```
+
+### Development install
+
+```bash
 python -m venv --system-site-packages .venv   # GTK4 comes from the system
 .venv/bin/pip install pymupdf
 ```
@@ -77,14 +95,6 @@ python -m venv --system-site-packages .venv   # GTK4 comes from the system
 
 ```bash
 ./run.sh [/path/to/file.pdf]
-```
-
-Desktop integration (optional):
-
-```bash
-cp com.nismo.pdfreader.desktop ~/.local/share/applications/
-update-desktop-database ~/.local/share/applications
-xdg-mime default com.nismo.pdfreader.desktop application/pdf
 ```
 
 ## Configuration

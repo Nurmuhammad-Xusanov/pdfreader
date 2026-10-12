@@ -64,11 +64,29 @@ Ranglar palitrasi va chizma qalinligini (`-`/`+`) tanlash mumkin.
 
 ## O'rnatish
 
-Talablar: GTK4 (PyGObject), Python 3.11+.
+Talablar: GTK4 (PyGObject) va Python 3.11+ systemdan.
+
+### Bir buyruq bilan (root'siz, AUR'siz)
 
 ```bash
 git clone https://github.com/Nurmuhammad-Xusanov/pdfreader.git
 cd pdfreader
+./install.sh
+```
+
+Bu ilovani `~/.local`ga o'rnatadi, `.desktop` yozuvini va ikonkani yaratadi hamda
+PDF Reader'ni `application/pdf` uchun standart dastur qilib belgilaydi. Ilovani
+menyudan, PDF'ni ikki marta bosib yoki `~/.local/bin/pdfreader` bilan oching.
+
+### GitHub release'dan
+
+```bash
+pipx run pip install ./pdfreader-0.1.0.whl
+```
+
+### Dasturchi (dev) o'rnatish
+
+```bash
 python -m venv --system-site-packages .venv   # GTK4 system'dan olinadi
 .venv/bin/pip install pymupdf
 ```
@@ -77,14 +95,6 @@ python -m venv --system-site-packages .venv   # GTK4 system'dan olinadi
 
 ```bash
 ./run.sh [/path/to/file.pdf]
-```
-
-Desktop integratsiya (ixtiyoriy):
-
-```bash
-cp com.nismo.pdfreader.desktop ~/.local/share/applications/
-update-desktop-database ~/.local/share/applications
-xdg-mime default com.nismo.pdfreader.desktop application/pdf
 ```
 
 ## Konfiguratsiya
