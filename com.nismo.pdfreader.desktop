@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Name=PDF Reader
+GenericName=PDF Viewer
+Comment=Yengil GTK4 PDF o'quvchi va annotator
+Exec=/home/nismo/Projects/pdfreader/run.sh %U
+Icon=com.nismo.pdfreader
+Terminal=false
+MimeType=application/pdf;
+Categories=Office;Viewer;
+Keywords=pdf;reader;viewer;annotation;note;
+StartupNotify=true
+StartupWMClass=com.nismo.pdfreader
