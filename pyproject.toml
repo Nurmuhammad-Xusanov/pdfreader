@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "com-nismo-pdfreader"
+version = "0.1.0"
+description = "Lightweight GTK4 PDF reader and annotator with OLED theme and stylus support"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.11"
+dependencies = ["pymupdf"]
+
+[project.gui-scripts]
+pdfreader = "pdfreader.app:main"
+
+[tool.setuptools]
+packages = ["pdfreader"]
+
+[tool.setuptools.package-data]
+pdfreader = ["icons/*.svg"]
