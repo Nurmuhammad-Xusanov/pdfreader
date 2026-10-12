@@ -29,6 +29,8 @@ class Application(Gtk.Application):
     def do_open(self, files, _n_files, _hint):
         self.do_activate()
         win = self.get_active_window()
+        if self.reading_mode:
+            win.enter_reading_mode()
         for gfile in files:
             win.load_file(gfile.get_path())
             break
