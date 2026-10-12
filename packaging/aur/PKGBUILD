@@ -1,0 +1,33 @@
+# Maintainer: Nurmuhammad Xusanov <nursherzil@gmail.com>
+# Contributor: Nurmuhammad Xusanov <nursherzil@gmail.com>
+
+pkgname=pdfreader
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="Lightweight GTK4 PDF reader and annotator with OLED theme, touch and stylus support"
+arch=('any')
+url="https://github.com/Nurmuhammad-Xusanov/pdfreader"
+license=('MIT')
+depends=('gtk4' 'python-gobject' 'python-pymupdf')
+makedepends=('python-build' 'python-installer' 'python-setuptools')
+checkdepends=('desktop-file-utils')
+source=("$pkgname-$pkgver.tar.gz::https://github.com/Nurmuhammad-Xusanov/pdfreader/archive/refs/tags/v$pkgver.tar.gz")
+sha256sums=('5f01b8d8ffa549aa292624851690c2676060cb056f58baed4314ada47a8c234f')
+
+build() {
+  cd "$srcdir/$pkgname-$pkgver"
+  python -m build --wheel --no-isolation
+}
+
+check() {
+  cd "$srcdir/$pkgname-$pkgver"
+  python -m compileall -q pdfreader
+  desktop-file-validate com.nismo.pdfreader.desktop
+}
+
+package() {
+  cd "$srcdir/$pkgname-$pkgver"
+  python -m installer --destdir="$pkgdir" dist/*.whl
+  install -Dm644 com.nismo.pdfreader.desktop -t "$pkgdir/usr/share/applications"
+  install -Dm644 com.nismo.pdfreader.svg -t "$pkgdir/usr/share/icons/hicolor/scalable/apps"
+}
