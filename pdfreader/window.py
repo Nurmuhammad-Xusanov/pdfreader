@@ -33,6 +33,9 @@ class MainWindow(Gtk.ApplicationWindow):
         self.canvas = Canvas(self.tool_state)
         self.config = load_config()
         self._swatches = []
+        self.btn_custom = None
+        self._color_dialog = Gtk.ColorDialog()
+        self._color_dialog.set_title("Rang tanlang")
         self._dirty = False
 
         self._install_css()
@@ -81,7 +84,7 @@ class MainWindow(Gtk.ApplicationWindow):
     # -------------------------------------------------------------- theme
     def _install_css(self):
         swatch_css = "\n".join(
-            ".sw-%d { background-image: none; background-color: rgba(%d,%d,%d,1); }"
+            ".swatches .sw-%d { background-image: none; background-color: rgba(%d,%d,%d,1); }"
             % (i, round(r * 255), round(g * 255), round(b * 255))
             for i, (r, g, b) in enumerate(PALETTE)
         )
@@ -108,9 +111,13 @@ class MainWindow(Gtk.ApplicationWindow):
                         color: #ffffff; border-color: #1f6feb; }
             .toolbar button:disabled { color: #4a4a4a; }
 
-            .swatch { min-width: 20px; min-height: 20px; padding: 0;
-                      border-radius: 5px; border: 2px solid #333333; }
-            .swatch.selected { border-color: #ffffff; }
+            .swatches .swatch { min-width: 22px; min-height: 22px; padding: 0;
+                      border-radius: 5px; border: 2px solid #3a3a3a; }
+            .swatches .swatch:hover { border-color: #6f6f6f; }
+            .swatches .swatch.selected { border-color: #ffffff; }
+            .swatches .sw-custom { background-image: linear-gradient(45deg,
+                      #ff0000 0%, #ff8800 15%, #ffee00 30%, #22dd44 45%,
+                      #00aaff 60%, #5533ff 75%, #cc00cc 90%, #ff0066 100%); }
 
             .toolbar-sep { background-color: #1c1c1c; min-width: 1px;
                            margin: 5px 4px; }
@@ -246,14 +253,23 @@ class MainWindow(Gtk.ApplicationWindow):
         bar.append(self._separator())
 
         # color palette
+        swatch_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=4)
+        swatch_box.add_css_class("swatches")
         for i, _rgb in enumerate(PALETTE):
             btn = Gtk.Button()
             btn.add_css_class("swatch")
             btn.add_css_class(f"sw-{i}")
             btn.set_tooltip_text("Rang")
             btn.connect("clicked", self._on_color_clicked, i)
-            bar.append(btn)
+            swatch_box.append(btn)
             self._swatches.append(btn)
+        self.btn_custom = Gtk.Button()
+        self.btn_custom.add_css_class("swatch")
+        self.btn_custom.add_css_class("sw-custom")
+        self.btn_custom.set_tooltip_text("Maxsus rang…")
+        self.btn_custom.connect("clicked", self._on_custom_color_clicked)
+        swatch_box.append(self.btn_custom)
+        bar.append(swatch_box)
         self._update_swatch_selection()
         bar.append(self._separator())
 
@@ -331,13 +347,34 @@ class MainWindow(Gtk.ApplicationWindow):
         self.tool_state.set_color(PALETTE[index])
         self._update_swatch_selection()
 
+    def _on_custom_color_clicked(self, button):
+        r, g, b = self.tool_state.current_color()
+        rgba = Gdk.RGBA()
+        rgba.red, rgba.green, rgba.blue, rgba.alpha = r, g, b, 1.0
+        self._color_dialog.choose_rgba(self, rgba, None, self._on_color_dialog_done)
+
+    def _on_color_dialog_done(self, dialog, result):
+        try:
+            rgba = dialog.choose_rgba_finish(result)
+        except GLib.Error:
+            return  # dialog cancelled
+        self.tool_state.set_color((rgba.red, rgba.green, rgba.blue))
+        self._update_swatch_selection()
+
     def _update_swatch_selection(self):
         active = self.tool_state.current_color()
+        found = False
         for i, btn in enumerate(self._swatches):
             if tuple(PALETTE[i]) == tuple(active):
                 btn.add_css_class("selected")
+                found = True
             else:
                 btn.remove_css_class("selected")
+        if self.btn_custom is not None:
+            if found:
+                self.btn_custom.remove_css_class("selected")
+            else:
+                self.btn_custom.add_css_class("selected")
 
     def _nudge_width(self, delta):
         self.tool_state.nudge_width(delta)
