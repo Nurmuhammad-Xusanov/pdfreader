@@ -87,11 +87,27 @@ update-desktop-database ~/.local/share/applications
 xdg-mime default com.nismo.pdfreader.desktop application/pdf
 ```
 
+## Configuration
+
+Create `~/.config/pdfreader/config.toml`:
+
+```toml
+night_mode = true          # start in OLED night mode
+fullscreen_on_open = true  # open fullscreen (reading mode)
+```
+
+Reading mode (night + fullscreen) can also be requested per launch:
+
+```bash
+./run.sh --reading-mode /path/to/file.pdf
+```
+
 ## Project layout
 
 ```
 pdfreader/
   app.py          Gtk.Application (HANDLES_OPEN, single instance)
+  config.py       loads ~/.config/pdfreader/config.toml
   window.py       window, compact toolbar, menu, actions
   canvas.py       rendering, overlays, gestures, undo/redo, note geometry
   document.py     PyMuPDF wrapper: render, text bbox, annot persistence

@@ -6,6 +6,7 @@ gi.require_version("Gtk", "4.0")
 from gi.repository import Gdk, Gio, GLib, Gtk
 
 from .canvas import Canvas
+from .config import load_config
 from .document import Document
 from .tools import ToolState
 
@@ -30,6 +31,7 @@ class MainWindow(Gtk.ApplicationWindow):
         self.document = None
         self.tool_state = ToolState()
         self.canvas = Canvas(self.tool_state)
+        self.config = load_config()
         self._swatches = []
         self._dirty = False
 
@@ -39,6 +41,19 @@ class MainWindow(Gtk.ApplicationWindow):
         self._build_actions()
         self.canvas.on_history_changed = self._on_history
         self.canvas.on_changed = self._on_canvas_changed
+        self._apply_config()
+
+    def _apply_config(self):
+        if self.config.get("night_mode"):
+            self.btn_invert.set_active(True)
+        if self.config.get("fullscreen_on_open"):
+            self.fullscreen()
+
+    def enter_reading_mode(self):
+        """Distraction-free mode used by the touch gesture: night + fullscreen."""
+        self.btn_invert.set_active(True)
+        if not self.is_fullscreen():
+            self.fullscreen()
 
     # ---------------------------------------------------------- callbacks
     def _on_history(self, can_undo, can_redo):

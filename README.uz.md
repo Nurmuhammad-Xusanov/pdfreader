@@ -87,11 +87,27 @@ update-desktop-database ~/.local/share/applications
 xdg-mime default com.nismo.pdfreader.desktop application/pdf
 ```
 
+## Konfiguratsiya
+
+`~/.config/pdfreader/config.toml` yarating:
+
+```toml
+night_mode = true          # OLED tungi rejimda boshlash
+fullscreen_on_open = true  # butun ekranda ochish (o'quv rejimi)
+```
+
+O'quv rejimini (tungi + butun ekran) ishga tushirishda ham so'rash mumkin:
+
+```bash
+./run.sh --reading-mode /path/to/file.pdf
+```
+
 ## Tuzilishi
 
 ```
 pdfreader/
   app.py          Gtk.Application (HANDLES_OPEN, single instance)
+  config.py       ~/.config/pdfreader/config.toml o'quvchi
   window.py       oyna, ixcham toolbar, menyu, harakatlar (actions)
   canvas.py       render, overlay, gesture'lar, undo/redo, izoh geom
   document.py     PyMuPDF wrapper: render, text bbox, annot persist
