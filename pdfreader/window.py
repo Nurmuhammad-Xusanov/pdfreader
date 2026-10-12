@@ -47,13 +47,23 @@ class MainWindow(Gtk.ApplicationWindow):
         if self.config.get("night_mode"):
             self.btn_invert.set_active(True)
         if self.config.get("fullscreen_on_open"):
-            self.fullscreen()
+            self._request_fullscreen()
+
+    def _request_fullscreen(self):
+        def _go(*_args):
+            if not self.is_fullscreen():
+                self.fullscreen()
+            return False
+
+        if self.get_mapped():
+            _go()
+        else:
+            self.connect("map", _go)
 
     def enter_reading_mode(self):
         """Distraction-free mode used by the touch gesture: night + fullscreen."""
         self.btn_invert.set_active(True)
-        if not self.is_fullscreen():
-            self.fullscreen()
+        self._request_fullscreen()
 
     # ---------------------------------------------------------- callbacks
     def _on_history(self, can_undo, can_redo):
