@@ -18,6 +18,7 @@ class Document:
             for i in range(self.page_count)
         ]
         self._lines = {}
+        self._words = {}
         self._dirty = False
 
     # ---- geometry -------------------------------------------------------
@@ -58,6 +59,44 @@ class Document:
                 lines.append((x0, y0, x1, y1))
             self._lines[index] = lines
         return self._lines[index]
+
+    def text_words(self, index):
+        """Return cached word bboxes [(x0,y0,x1,y1), ...] for a page."""
+        if index not in self._words:
+            page = self.doc[index]
+            W, H = self._sizes[index]
+            boxes = []
+            try:
+                words = page.get_text("words")
+                if words:
+                    from collections import defaultdict
+
+                    by_line = defaultdict(list)
+                    for w in words:
+                        by_line[(w[5], w[6])].append(w)
+                    for lst in by_line.values():
+                        lst.sort(key=lambda x: x[0])
+                        for w in lst:
+                            boxes.append((w[0], w[1], w[2], w[3]))
+            except Exception:
+                boxes = []
+
+            if len(boxes) < 5:
+                boxes = list(self.text_lines(index))
+
+            # filter out very large blocks
+            boxes_f = []
+            for b in boxes:
+                x0, y0, x1, y1 = b
+                w, h = x1 - x0, y1 - y0
+                if W and H and w > 0.9 * W and h > 0.7 * H:
+                    continue
+                boxes_f.append(b)
+            if boxes_f:
+                boxes = boxes_f
+
+            self._words[index] = boxes
+        return self._words[index]
 
     # ---- rendering ------------------------------------------------------
     def render(self, index, zoom, scale=1.0, invert=False):

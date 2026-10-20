@@ -148,7 +148,7 @@ class MainWindow(Gtk.ApplicationWindow):
         self.set_titlebar(header)
 
         self.lbl_title = Gtk.Label(label="PDF Reader")
-        header.set_title_widget(self.lbl_title)
+        header.set_title_widget(None)  # Remove title to avoid thick ugly title
 
         menu_btn = Gtk.MenuButton()
         menu_btn.set_icon_name("open-menu-symbolic")

@@ -494,7 +494,9 @@ class Canvas(Gtk.Widget):
             self.queue_draw()
             return
         if active["kind"] == "highlight":
-            self._commit(self._finalize_highlight(active))
+            self._commit(Stroke(active["page"], self.tool_state.highlight_color,
+                                self.tool_state.highlight_width, active["pts"],
+                                opacity=self.tool_state.highlight_opacity))
         else:
             self._commit(Stroke(active["page"], active["color"],
                                 active["width"], active["pts"]))
@@ -503,15 +505,24 @@ class Canvas(Gtk.Widget):
     def _finalize_highlight(self, active):
         page = active["page"]
         pts = active["pts"]
-        lines = self.doc.text_lines(page)
+        boxes = self.doc.text_words(page)
         chosen = []
         for px, py, _p in pts:
-            for lb in lines:
-                x0, y0, x1, y1 = lb
-                if x0 - 3 <= px <= x1 + 3 and y0 - 2 <= py <= y1 + 2:
-                    if lb not in chosen:
-                        chosen.append(lb)
+            for b in boxes:
+                x0, y0, x1, y1 = b
+                if x0 - 4 <= px <= x1 + 4 and y0 - 2 <= py <= y1 + 2:
+                    if b not in chosen:
+                        chosen.append(b)
                     break
+        if len(chosen) > 1:
+            merged = []
+            for b in sorted(chosen, key=lambda q: (q[1], q[0])):
+                if merged and abs(b[1] - merged[-1][1]) < 6 and b[0] <= merged[-1][2] + 8:
+                    last = merged.pop()
+                    merged.append((last[0], min(last[1], b[1]), max(last[2], b[2]), max(last[3], b[3])))
+                else:
+                    merged.append(b)
+            chosen = merged
         if chosen:
             return Highlight(page, self.tool_state.highlight_color,
                              self.tool_state.highlight_opacity, chosen)
